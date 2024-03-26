@@ -43,18 +43,17 @@
   box-shadow: none;
   outline: none;
   border: none;
-  /* height: 100%; */
-  /* font-size: 30px; */
+  font-size: 14px;
+  color: white;
 }
 
-/* form {
-  display: flex;
-} */
-
 .immutable-output {
-  font-size: 12px;
+  font-size: 14px;
   font-family: monospace;
   background-color: #3b3b3b;
   border-bottom: none;
   text-align: left;
+  margin-left: 2px;
+  line-height: 17px;
+  color: white;
 }

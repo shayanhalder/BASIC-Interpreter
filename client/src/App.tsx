@@ -1,11 +1,12 @@
 import { useState, useRef } from "react";
 import { io } from "socket.io-client";
+import ImmutableTextArea from "./ImmutableTextArea";
 import "./App.css";
 
 function App() {
   // const LOCAL_HOST = "http://127.0.0.1:3002";
   const [userInput, setUserInput] = useState<string | null>(null);
-  const [currentOutput, setCurrentOutput] = useState<string | null>("POTATO\nTOMATO\n3");
+  const [currentOutput, setCurrentOutput] = useState<string | null>("POTATO\nTOMATO\n3\n5");
 
   let codeRef: React.MutableRefObject<any> = useRef<string>(null);
   let outputRef: React.MutableRefObject<any> = useRef<string>(null);
@@ -80,7 +81,8 @@ function App() {
           onFocus={() => (rightRef.current.style.border = "2px solid #99C8FF")}
           onBlur={() => (rightRef.current.style.border = "1px solid white")}
         >
-          <div className="immutable-output">{currentOutput}</div>
+          <ImmutableTextArea text={currentOutput} />
+
           <textarea
             className="code-input code-output"
             onChange={(e) => setUserInput(e.target.value)}
