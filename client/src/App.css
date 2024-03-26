@@ -1,0 +1,45 @@
+#root {
+  max-width: 1280px;
+  margin: 0px auto;
+  text-align: center;
+}
+
+.base {
+  height: 80vh;
+  display: flex;
+}
+
+.editor {
+  border: 1px solid white;
+  width: 50%;
+  height: 100%;
+  margin-right: 10%;
+}
+
+/* .text-input {
+  border: 1px solid white;
+  width: 50%;
+  height: 100%;
+  margin-right: 10%;
+} */
+
+.output {
+  border: 1px solid white;
+  width: 50%;
+  height: 100%;
+}
+
+.code-input {
+  resize: none;
+  width: 99%;
+  height: 99%;
+}
+
+.code-output {
+  caret-color: yellow;
+  /* font-size: 30px; */
+}
+
+/* form {
+  display: flex;
+} */
