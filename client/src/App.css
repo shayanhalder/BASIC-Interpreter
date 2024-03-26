@@ -27,6 +27,8 @@
   border: 1px solid white;
   width: 50%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .code-input {
@@ -37,9 +39,22 @@
 
 .code-output {
   caret-color: yellow;
+  border-top: none;
+  box-shadow: none;
+  outline: none;
+  border: none;
+  /* height: 100%; */
   /* font-size: 30px; */
 }
 
 /* form {
   display: flex;
 } */
+
+.immutable-output {
+  font-size: 12px;
+  font-family: monospace;
+  background-color: #3b3b3b;
+  border-bottom: none;
+  text-align: left;
+}
