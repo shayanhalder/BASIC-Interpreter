@@ -13,7 +13,9 @@ class Interpreter:
         self._variables = dict()
         self._labels = dict()
         self._gosub_callstack = [] # contains all line numbers being remembered from GOSUB statements
+        self._user_inputs = []
         self._socketio = socket_connection
+        self._current_output = ''
 
     def run(self) -> None:
         """ Runs the interpreter on the provided GRIN code from the user. """
@@ -42,9 +44,40 @@ class Interpreter:
                 statement_tokens = current_line_tokens
 
             line_number_change = self._execute_statement(statement_tokens, current_line_label)
-            if line_number_change is None:
-                break
+            if type(line_number_change) is not int:
+                current_interpreter_state = {
+                    'max_lines': self._max_lines,
+                    'current_line': self._current_line,
+                    'variables': self._variables,
+                    'labels': self._labels,
+                    'callstack': self._gosub_callstack,
+                    'output': self._current_output
+                }
+                if line_number_change is None:
+                    current_interpreter_state['paused'] = False
+                    current_interpreter_state['input_query'] = None
+                elif line_number_change == "INNUM":
+                    current_interpreter_state['paused'] = True
+                    current_interpreter_state['input_query'] = "INNUM"
+                elif line_number_change == "INSTR":
+                    current_interpreter_state['paused'] = True
+                    current_interpreter_state['input_query'] = "INSTR"
+                    
+                return current_interpreter_state
+            
             self._current_line += line_number_change
+        current_interpreter_state = {
+            'max_lines': self._max_lines,
+            'current_line': self._current_line,
+            'variables': self._variables,
+            'labels': self._labels,
+            'callstack': self._gosub_callstack,
+            'paused': False,
+            'input_query': None,
+            'output': self._current_output
+        }
+        return current_interpreter_state
+        
 
     def _execute_statement(self, current_line_tokens: list[GrinToken], label:str=None) -> int | None: # assumes no label in current_line_tokens
         """ Executes a line of GRIN code and returns an integer representing the change in the
@@ -76,13 +109,21 @@ class Interpreter:
 
         # can't unit test INNUM and INSTR since that requires redirecting input, which we didn't learn
         elif keyword.kind() is GrinTokenKind.INNUM:
-            flask_socketio.emit('input-event', 'innum triggered')    
-            statement = basic.user_input.InputNumber(current_line_tokens, self._current_line,
-                                                    self._variables, label, test_input=input)
+            if len(self._user_inputs) > 0:
+                statement = basic.user_input.InputNumber(current_line_tokens, self._current_line,
+                                                    self._variables, label, test_input=self._user_inputs.pop())
+            else:
+                return "INNUM"  
+            # statement = basic.user_input.InputNumber(current_line_tokens, self._current_line,
+                                                   # self._variables, label, test_input=input)
 
         elif keyword.kind() is GrinTokenKind.INSTR:
-            statement = basic.user_input.InputString(current_line_tokens, self._current_line,
-                                                    self._variables, label)
+            # return "INSTR"
+            if len(self._user_inputs) > 0:
+                statement = basic.user_input.InputString(current_line_tokens, self._current_line,
+                                                    self._variables, label, test_input=self._user_inputs.pop())
+            else:
+                return "INSTR"
 
         elif keyword.kind() is GrinTokenKind.GOTO:
             statement = basic.control_flow.GoToStatement(current_line_tokens, self._current_line, self._max_lines,
