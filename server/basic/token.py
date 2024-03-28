@@ -1,23 +1,7 @@
-# token.py
-#
-# ICS 33 Winter 2024
-# Project 3: Why Not Smile?
-#
-# Classes used to describe tokens in a Grin program.
-#
-# * GrinToken, which describes one token in its entirety.
-# * GrinTokenKind, which identifies a type of token, such as a literal integer
-#   or the keyword SUB.
-# * GrinTokenCategory, which kinds of tokens into broader categories.
-#
-# WHAT YOU'LL NEED TO DO: Nothing.  This module is provided in its entirety,
-# and it should not be necessary to change it.
 
 from enum import Enum
 from basic.location import GrinLocation
 from typing import Any
-
-
 
 class GrinTokenCategory(Enum):
     """A categorization of Grin tokens, which combines multiple kinds of

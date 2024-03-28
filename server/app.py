@@ -57,7 +57,6 @@ def greet_client(body: str):
     print('received input code: ')
     print(body)
     body = json.loads(body.replace("\n", "\\n"))
-    print(type(body))
     
     input_code = body['body']
     parsed_input = input_code.split("\n")

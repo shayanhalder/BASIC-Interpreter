@@ -45,7 +45,7 @@ function App() {
     socket.emit("continue-execution", newRawBody);
   });
 
-  async function getOutput(e: any) {
+  async function getOutput() {
     outputRef.current.focus();
 
     if (codeRef.current) {
@@ -60,7 +60,7 @@ function App() {
   return (
     <>
       <h1> BASIC Interpreter </h1>
-      <button onClick={(e) => getOutput(e)}> Run </button>
+      <button onClick={() => getOutput()}> Run </button>
       <div className="base">
         <div className="editor">
           <textarea className="code-input" ref={codeRef}></textarea>
