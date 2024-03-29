@@ -1,7 +1,5 @@
-
-
 import basic
-from flask import Flask, request, jsonify
+from flask import Flask 
 from flask_cors import CORS
 import contextlib
 from flask_socketio import SocketIO
@@ -16,37 +14,43 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 def hello_world():
     print('home page')
     return 'Hello from Flask!'
-
-# @app.route('/interpreter', methods=['POST'])
-# def get_output():
-#     print('LOG: Getting BASIC output from interpreter. ')
-
-#     article_info = request.json
-#     input_code = article_info['body']
-#     parsed_input = input_code.split("\n") 
-
-#     tokens = get_tokens(parsed_input)
-#     if tokens is not None:
-#         with contextlib.redirect_stdout(io.StringIO()) as output:
-#             interpreter = basic.Interpreter(tokens, socketio)
-#             interpreter.run()
-        
-#         output_code = output.getvalue()
-#         return output_code
-#     else:
-#         return "error"
     
 @socketio.on('connect')
 def greet():
-    print('connected to client')
+    print('Flask Server established socket connection with client')
+
+@socketio.on('continue-execution')
+def continue_execution(obj):
+    parsed_data = json.loads(obj.replace("\n", "\\n"))
+    interpreter_state = parsed_data['body']
+    parsed_input_code = interpreter_state['lines'].split("\n")
+    tokens = get_tokens(parsed_input_code)
+    
+    print(interpreter_state)
+    
+    if tokens is not None:
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            interpreter = basic.Interpreter(tokens, socketio)
+            interpreter.configure_state(interpreter_state)
+            final_state = interpreter.run()
+
+        output_code = output.getvalue()
+        print('Final interpreter state', final_state)
+        final_state['output'] += output_code
+        final_state['lines'] = interpreter_state['lines']
+        
+        if not final_state['paused']:
+            socketio.emit('execution-finished', final_state)
+        else: # we are paused
+            socketio.emit('input-event', final_state)
+
 
 @socketio.on('run-interpreter')
 def greet_client(body: str):
-    print('running interpreter')
-    print('received input code: ')
+    print('Running interpreter')
+    print('Received input code: ')
     print(body)
     body = json.loads(body.replace("\n", "\\n"))
-    print(type(body))
     
     input_code = body['body']
     parsed_input = input_code.split("\n")
@@ -55,12 +59,17 @@ def greet_client(body: str):
     if tokens is not None:
         with contextlib.redirect_stdout(io.StringIO()) as output:
             interpreter = basic.Interpreter(tokens, socketio)
-            interpreter.run()
-        
+            final_state = interpreter.run()
+            
         output_code = output.getvalue()
-        return output_code
-    else:
-        return "error"
+        print('Final interpreter state: ', final_state)
+        final_state['output'] += output_code
+        final_state['lines'] = input_code
+        
+        if not final_state['paused']:
+            socketio.emit('execution-finished', final_state)
+        else: # we are paused
+            socketio.emit('input-event', final_state)
     
 
 def get_tokens(grin_code: list[str]) -> list[list[basic.GrinToken]] | None:
@@ -73,6 +82,5 @@ def get_tokens(grin_code: list[str]) -> list[list[basic.GrinToken]] | None:
         return None
 
 if __name__ == "__main__":
-    # app.run(debug=True, host="0.0.0.0", port='3002')
     socketio.run(app, debug=True, host="0.0.0.0", port='3002')
 

@@ -1,83 +1,101 @@
 import { useState, useRef } from "react";
 import { io } from "socket.io-client";
+import ImmutableTextArea from "./ImmutableTextArea";
 import "./App.css";
 
 function App() {
-  // const LOCAL_HOST = "http://127.0.0.1:3002";
+  const SERVER = "https://halders2.pythonanywhere.com/";
+  const LOCAL_HOST = "http://127.0.0.1:3002";
+
+  const [userInput, setUserInput] = useState<string | null>(null);
   const [currentOutput, setCurrentOutput] = useState<string | null>(null);
+  const [numLines, setNumLines] = useState<number | null>(0);
 
   let codeRef: React.MutableRefObject<any> = useRef<string>(null);
   let outputRef: React.MutableRefObject<any> = useRef<string>(null);
+  let rightRef: React.MutableRefObject<any> = useRef<string>(null);
 
-  const socket = io("http://127.0.0.1:3002/", {
+  const socket = io(LOCAL_HOST, {
     withCredentials: true,
   });
+
   socket.on("connect", () => {
-    console.log("socket connected with server");
+    console.log("Client established socket connection with server");
   });
 
-  socket.on("input-event", (message) => {
-    console.log("input statement detected. message from server: ");
-    console.log(message);
-    return;
-    // socket.emit("input-provided", "420");
+  socket.on("execution-finished", (interpreterState) => {
+    console.log("Execution-Finished event received from server");
+    console.log("Interpreter State: ");
+    console.log(interpreterState);
+    setCurrentOutput(interpreterState["output"]);
   });
 
-  async function getOutput(e: any) {
-    e.preventDefault();
+  socket.on("input-event", (interpreterState) => {
+    console.log("Input-Event event response received from server");
+    console.log("Interpreter State: ");
+    console.log(interpreterState);
+
+    const lastLine = interpreterState["current_line"];
+    const inputCode = interpreterState["lines"].split("\n");
+
+    const userInput = prompt(`${inputCode[lastLine]}`);
+
+    interpreterState["user_input"] = userInput;
+    const newRawBody = JSON.stringify({
+      body: interpreterState,
+    });
+
+    socket.emit("continue-execution", newRawBody);
+  });
+
+  async function getOutput() {
     outputRef.current.focus();
 
-    // socket.on("input-event", (message) => {
-    //   console.log("input statement detected. message from server: ");
-    //   console.log(message);
-    //   socket.emit("input-provided", "420");
-    // });
     if (codeRef.current) {
       const inputCode = codeRef.current.value;
       const rawBody = JSON.stringify({
         body: inputCode,
       });
-
       socket.emit("run-interpreter", rawBody);
-
-      // const response = await fetch(`${LOCAL_HOST}/interpreter`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     "Access-Control-Allow-Origin": "*",
-      //   },
-
-      //   body: rawBody,
-      // });
-      // const data = await response.text();
-      socket.once("user-input", (terminalOutput: string, numInputs: number) => {
-        console.log(terminalOutput);
-        console.log(numInputs);
-        outputRef.current.focus();
-      });
-      // if (data[data.length - 1] == "@") {
-
-      // }
-      // console.log(data);
-      // setCurrentOutput(data);
     }
   }
+
+  // function checkNewLines(e: any) {
+  //   const length = e.target.value.length;
+  //   const last = e.target.value.slice(length - 2, length);
+  //   // console.log(last);
+  //   const match = /\r|\n/.exec(last);
+  //   // console.log(match);
+
+  //   if (numLines != null && match && match.length > 0) {
+  //     console.log("increase");
+  //     setNumLines(numLines + 1);
+  //   }
+  // }
 
   return (
     <>
       <h1> BASIC Interpreter </h1>
-      <button onClick={getOutput}> Run </button>
+      <button onClick={() => getOutput()}> Run </button>
+      <h6> num lines: {numLines}</h6>
       <div className="base">
         <div className="editor">
           <textarea className="code-input" ref={codeRef}></textarea>
         </div>
 
-        <div className="output">
+        <div
+          className="output"
+          ref={rightRef}
+          onFocus={() => (rightRef.current.style.border = "2px solid #99C8FF")}
+          onBlur={() => (rightRef.current.style.border = "1px solid white")}
+        >
+          <ImmutableTextArea text={currentOutput} />
+
           <textarea
             className="code-input code-output"
-            onChange={(e) => setCurrentOutput(e.target.value)}
+            onChange={(e) => setUserInput(e.target.value)}
             ref={outputRef}
-            value={currentOutput ? currentOutput : ""}
+            value={userInput ? userInput : ""}
           />
         </div>
       </div>

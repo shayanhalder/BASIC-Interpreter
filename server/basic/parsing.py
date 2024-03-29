@@ -1,24 +1,8 @@
-# parsing.py
-#
-# ICS 33 Winter 2024
-# Project 3: Why Not Smile?
-#
-# A parser for the Grin language, which takes a sequence of strings containing
-# lines of Grin code and returns a corresponding sequence in which every
-# element is a list of GrinTokens.  Importantly, though, this only succeeds
-# if there are no parse errors (e.g., a statement that doesn't start with a
-# keyword, a GOTO statement that's missing a target, etc.) on the line.  When
-# a parse error is detected, a GrinParseError is raised instead.
-#
-# WHAT YOU'LL NEED TO DO: Nothing.  This module is provided in its entirety,
-# and it should not be necessary to change it.
 
 from typing import Callable, Iterable, NoReturn
 from basic.lexing import to_tokens
 from basic.location import GrinLocation
 from basic.token import GrinTokenKind, GrinToken
-
-
 
 class GrinParseError(Exception):
     """Raised when a parse error is found during parsing, with an error message

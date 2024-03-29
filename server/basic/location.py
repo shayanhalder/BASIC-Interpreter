@@ -1,15 +1,3 @@
-# location.py
-#
-# ICS 33 Winter 2024
-# Project 3: Why Not Smile?
-#
-# Defines a class called GrinLocation, whose objects describe a location within
-# the text of a Grin program (i.e., a line number and a column number).
-#
-# WHAT YOU'LL NEED TO DO: Nothing.  This module is provided in its entirety,
-# and it should not be necessary to change it.
-
-
 
 class GrinLocation:
     """Describes a location within the text of a Grin program"""

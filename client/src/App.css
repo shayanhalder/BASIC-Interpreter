@@ -27,19 +27,35 @@
   border: 1px solid white;
   width: 50%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .code-input {
   resize: none;
   width: 99%;
   height: 99%;
+  white-space: nowrap;
+  overflow: auto;
 }
 
 .code-output {
   caret-color: yellow;
-  /* font-size: 30px; */
+  border-top: none;
+  box-shadow: none;
+  outline: none;
+  border: none;
+  font-size: 14px;
+  color: white;
 }
 
-/* form {
-  display: flex;
-} */
+.immutable-output {
+  font-size: 14px;
+  font-family: monospace;
+  background-color: #3b3b3b;
+  border-bottom: none;
+  text-align: left;
+  margin-left: 2px;
+  line-height: 17px;
+  color: white;
+}

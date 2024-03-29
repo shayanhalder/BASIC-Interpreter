@@ -1,13 +1,3 @@
-# lexing.py
-#
-# ICS 33 Winter 2024
-# Project 3: Why Not Smile?
-#
-# A lexer for the Grin language, whose job is to take a string containing one
-# line of Grin code and generate a sequence of GrinTokens from it.
-#
-# WHAT YOU'LL NEED TO DO: Nothing.  This module is provided in its entirety,
-# and it should not be necessary to change it.
 
 from collections import defaultdict
 from basic.location import GrinLocation
