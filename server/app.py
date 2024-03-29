@@ -1,5 +1,5 @@
 import basic
-from flask import Flask, request, jsonify
+from flask import Flask 
 from flask_cors import CORS
 import contextlib
 from flask_socketio import SocketIO
@@ -31,17 +31,11 @@ def continue_execution(obj):
     if tokens is not None:
         with contextlib.redirect_stdout(io.StringIO()) as output:
             interpreter = basic.Interpreter(tokens, socketio)
-            interpreter._current_line = interpreter_state['current_line']
-            interpreter._variables = interpreter_state['variables']
-            interpreter._labels = interpreter_state['labels']
-            interpreter._gosub_callstack = interpreter_state['callstack']
-            interpreter._user_inputs.append(interpreter_state['user_input'])
-            interpreter._current_output = interpreter_state['output']
-            
+            interpreter.configure_state(interpreter_state)
             final_state = interpreter.run()
 
         output_code = output.getvalue()
-        print('final state', final_state)
+        print('Final interpreter state', final_state)
         final_state['output'] += output_code
         final_state['lines'] = interpreter_state['lines']
         
@@ -53,8 +47,8 @@ def continue_execution(obj):
 
 @socketio.on('run-interpreter')
 def greet_client(body: str):
-    print('running interpreter')
-    print('received input code: ')
+    print('Running interpreter')
+    print('Received input code: ')
     print(body)
     body = json.loads(body.replace("\n", "\\n"))
     
@@ -67,10 +61,9 @@ def greet_client(body: str):
             interpreter = basic.Interpreter(tokens, socketio)
             final_state = interpreter.run()
             
-            
         output_code = output.getvalue()
-        print('final state', final_state)
-        final_state['output'] = output_code
+        print('Final interpreter state: ', final_state)
+        final_state['output'] += output_code
         final_state['lines'] = input_code
         
         if not final_state['paused']:

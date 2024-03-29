@@ -16,7 +16,18 @@ class Interpreter:
         self._user_inputs = []
         self._socketio = socket_connection
         self._current_output = ''
-
+        
+    def configure_state(self, interpreter_state: dict) -> None:
+        """ Configures interpreter to a specific state such that it can continue 
+            execution where it left off. """
+            
+        self._current_line = interpreter_state['current_line']
+        self._variables = interpreter_state['variables']
+        self._labels = interpreter_state['labels']
+        self._gosub_callstack = interpreter_state['callstack']
+        self._user_inputs.append(interpreter_state['user_input'])
+        self._current_output = interpreter_state['output']
+        
     def run(self) -> None:
         """ Runs the interpreter on the provided GRIN code from the user. """
 
@@ -66,6 +77,7 @@ class Interpreter:
                 return current_interpreter_state
             
             self._current_line += line_number_change
+            
         current_interpreter_state = {
             'max_lines': self._max_lines,
             'current_line': self._current_line,

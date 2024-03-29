@@ -35,6 +35,8 @@
   resize: none;
   width: 99%;
   height: 99%;
+  white-space: nowrap;
+  overflow: auto;
 }
 
 .code-output {

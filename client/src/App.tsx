@@ -4,9 +4,12 @@ import ImmutableTextArea from "./ImmutableTextArea";
 import "./App.css";
 
 function App() {
+  const SERVER = "https://halders2.pythonanywhere.com/";
   const LOCAL_HOST = "http://127.0.0.1:3002";
+
   const [userInput, setUserInput] = useState<string | null>(null);
   const [currentOutput, setCurrentOutput] = useState<string | null>(null);
+  const [numLines, setNumLines] = useState<number | null>(0);
 
   let codeRef: React.MutableRefObject<any> = useRef<string>(null);
   let outputRef: React.MutableRefObject<any> = useRef<string>(null);
@@ -57,10 +60,24 @@ function App() {
     }
   }
 
+  // function checkNewLines(e: any) {
+  //   const length = e.target.value.length;
+  //   const last = e.target.value.slice(length - 2, length);
+  //   // console.log(last);
+  //   const match = /\r|\n/.exec(last);
+  //   // console.log(match);
+
+  //   if (numLines != null && match && match.length > 0) {
+  //     console.log("increase");
+  //     setNumLines(numLines + 1);
+  //   }
+  // }
+
   return (
     <>
       <h1> BASIC Interpreter </h1>
       <button onClick={() => getOutput()}> Run </button>
+      <h6> num lines: {numLines}</h6>
       <div className="base">
         <div className="editor">
           <textarea className="code-input" ref={codeRef}></textarea>
